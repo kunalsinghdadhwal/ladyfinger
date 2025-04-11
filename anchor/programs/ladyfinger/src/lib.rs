@@ -1,70 +1,47 @@
-#![allow(clippy::result_large_err)]
-
 use anchor_lang::prelude::*;
+use instructions::*;
 
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+mod constants;
+mod error;
+mod instructions;
+mod state;
+
+declare_id!("FpHAYNSwNYK7wKwa9hAocY5xBiHz6VkxsBBFSDAvmJUy");
 
 #[program]
 pub mod ladyfinger {
+
     use super::*;
 
-  pub fn close(_ctx: Context<CloseLadyfinger>) -> Result<()> {
-    Ok(())
-  }
+    pub fn init_bank(
+        ctx: Context<InitBank>,
+        liquidation_threshold: u64,
+        max_ltv: u64,
+    ) -> Result<()> {
+        process_init_bank(ctx, liquidation_threshold, max_ltv)
+    }
 
-  pub fn decrement(ctx: Context<Update>) -> Result<()> {
-    ctx.accounts.ladyfinger.count = ctx.accounts.ladyfinger.count.checked_sub(1).unwrap();
-    Ok(())
-  }
+    pub fn init_user(ctx: Context<InitUser>, usdc_address: Pubkey) -> Result<()> {
+        process_init_user(ctx, usdc_address)
+    }
 
-  pub fn increment(ctx: Context<Update>) -> Result<()> {
-    ctx.accounts.ladyfinger.count = ctx.accounts.ladyfinger.count.checked_add(1).unwrap();
-    Ok(())
-  }
+    pub fn deposit(ctx: Context<Deposit>, amount: u64) -> Result<()> {
+        process_deposit(ctx, amount)
+    }
 
-  pub fn initialize(_ctx: Context<InitializeLadyfinger>) -> Result<()> {
-    Ok(())
-  }
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+        process_withdraw(ctx, amount)
+    }
 
-  pub fn set(ctx: Context<Update>, value: u8) -> Result<()> {
-    ctx.accounts.ladyfinger.count = value.clone();
-    Ok(())
-  }
-}
+    pub fn borrow(ctx: Context<Borrow>, amount: u64) -> Result<()> {
+        process_borrow(ctx, amount)
+    }
 
-#[derive(Accounts)]
-pub struct InitializeLadyfinger<'info> {
-  #[account(mut)]
-  pub payer: Signer<'info>,
+    pub fn repay(ctx: Context<Repay>, amount: u64) -> Result<()> {
+        process_repay(ctx, amount)
+    }
 
-  #[account(
-  init,
-  space = 8 + Ladyfinger::INIT_SPACE,
-  payer = payer
-  )]
-  pub ladyfinger: Account<'info, Ladyfinger>,
-  pub system_program: Program<'info, System>,
-}
-#[derive(Accounts)]
-pub struct CloseLadyfinger<'info> {
-  #[account(mut)]
-  pub payer: Signer<'info>,
-
-  #[account(
-  mut,
-  close = payer, // close account and return lamports to payer
-  )]
-  pub ladyfinger: Account<'info, Ladyfinger>,
-}
-
-#[derive(Accounts)]
-pub struct Update<'info> {
-  #[account(mut)]
-  pub ladyfinger: Account<'info, Ladyfinger>,
-}
-
-#[account]
-#[derive(InitSpace)]
-pub struct Ladyfinger {
-  count: u8,
+    pub fn liquidate(ctx: Context<Liquidate>) -> Result<()> {
+        process_liquidate(ctx)
+    }
 }

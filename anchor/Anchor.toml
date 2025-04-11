@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-ladyfinger = "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"
+ladyfinger = "FpHAYNSwNYK7wKwa9hAocY5xBiHz6VkxsBBFSDAvmJUy"
 
 [registry]
 url = "https://api.apr.dev"
